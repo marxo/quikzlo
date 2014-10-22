@@ -1,6 +1,6 @@
 <?php
 ob_start();
-define('QZ_VER', "0.0.1");
+define('QZ_VER', "0.0.2");
 session_start();
 
 if (isset($_GET['zl']))
@@ -96,6 +96,10 @@ if ($_GET['qz-page'] === "create"): ?>
   {
     $_SESSION['qz-id'] = uniqid('qz_');
     $_SESSION['qz-file'] = $target_dir . $_SESSION['qz-id'] . ".zl";
+    if (!file_exists($_SESSION['qz-file']))
+    {
+        mkdir($target_dir, 0777, true);
+    }
     fopen($_SESSION['qz-file'], "w");
     $header = "ZLO\n" . "VAR " . $_POST['np-var'] . "\n" . "VER " . $_POST['np-ver'] . "\n" . "REV " . date("c") . "\n" . "PRV " . $_POST['np-prv'] . "\n" . "PRE " . $_POST['np-mail'] . "\n" . "PRU " . $_POST['np-www'] . "\n" . "CHR " . $_POST['np-enc'] . "\n" . "BDO " . $_POST['np-dir'] . "\n" . str_repeat("@@@\n", 6) . "GEN QuikZLO " . QZ_VER . "\n" . "\n";
     file_put_contents($_SESSION['qz-file'], $header);
@@ -108,21 +112,14 @@ if ($_GET['qz-page'] === "create"): ?>
 elseif ($_GET['qz-page'] === "add"): ?>
 
 <?php
-  if (!file_exists($_SESSION['qz-file']))
-  {
-    if (file_get_contents($_SESSION['qz-file']) [0] !== "Z")
-    { ?>
-<h2>You don't have a header in your file or it is malformed</h2>
-<h3>Create a new translation or check you file for errors in a text editor</h3>
 
-<?php
-    }
-
-    if (file_exists($_SESSION['qz-file']))
+    if ( file_exists($_SESSION['qz-file']) && file_get_contents($_SESSION['qz-file']) [0] !== "Z")
     {
-      $cf = file($_SESSION['qz-file']);
-    }
-  } ?>
+          $cf = file($_SESSION['qz-file']);
+    } elseif (!file_exists($_SESSION['qz-file'])) { ?>
+    <h2>You don't have a header in your file or it is malformed</h2>
+    <h3>Create a new translation or check you file for errors in a text editor</h3>
+    <?php } ?>
 <h2>Add translations</h2>
 
 <form method="POST">
