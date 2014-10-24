@@ -5,7 +5,7 @@ QuikZLO
 
 Let's you create and edit ZLO localization files. Just one file. Size is subject to change.
 
-Version: **0.0.1**
+Version: **0.0.3**
 
 *To-do*:
 

@@ -1,6 +1,11 @@
 Changelog
 ==========
 
+0.0.3
+--------
+
+ - Fixed revision on save and add translation
+
 0.0.2
 --------
 

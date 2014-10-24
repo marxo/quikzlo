@@ -1,6 +1,6 @@
 <?php
 ob_start();
-define('QZ_VER', "0.0.2");
+define('QZ_VER', "0.0.3");
 session_start();
 
 if (isset($_GET['zl']))
@@ -113,7 +113,7 @@ elseif ($_GET['qz-page'] === "add"): ?>
 
 <?php
 
-    if ( file_exists($_SESSION['qz-file']) && file_get_contents($_SESSION['qz-file']) [0] !== "Z")
+    if (file_exists($_SESSION['qz-file']) && file_get_contents($_SESSION['qz-file'])[0])
     {
           $cf = file($_SESSION['qz-file']);
     } elseif (!file_exists($_SESSION['qz-file'])) { ?>
@@ -136,11 +136,14 @@ elseif ($_GET['qz-page'] === "add"): ?>
     <button type="submit" name="pr-submit">Add</button>
 </form>
 <?php
+
   if (isset($_POST['pr-submit']))
   {
     $line = "\n";
     $line.= "!i " . trim($_POST['pr-izvor']) . "\n" . "!m " . trim($_POST['pr-prevod']) . "\n" . "!p " . trim($_POST['pr-izvor-pl']) . "\n" . "!2 " . trim($_POST['pr-prevod-2']) . "\n" . "!3 " . trim($_POST['pr-prevod-3']) . "\n";
     file_put_contents($_SESSION['qz-file'], $line, FILE_APPEND);
+    $cf[3] = "REV " . date('c') . "\n";
+    file_put_contents($_SESSION['qz-file'], $cf);
   }
 
   if (isset($_SESSION['qz-file']) && file_exists($_SESSION['qz-file']))
@@ -268,9 +271,12 @@ if ($_GET['qz-page'] === "dl"): ?>
   if (file_exists($_SESSION['qz-file']))
   {
     $cf = file($_SESSION['qz-file']);
-    header('Content-Disposition: attachment; filename="' . trim(substr($cf[1], 3)) . '.zl"');
-    ob_clean();
+    $cf[3] = "REV " . date('c') . "\n";
+    $rf = implode('', $cf);
+    file_put_contents($_SESSION['qz-file'], $rf);
     flush();
+    ob_clean();
+    header('Content-Disposition: attachment; filename="' . trim(substr($cf[1], 3)) . '.zl"');
     readfile($_SESSION['qz-file']);
   }
 
