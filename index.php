@@ -1,6 +1,6 @@
 <?php
 ob_start();
-define('QZ_VER', "0.0.3");
+define('QZ_VER', "0.0.4");
 session_start();
 
 if (isset($_GET['zl']))
@@ -21,7 +21,7 @@ $target_dir = "tmp/";
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 
     <title>QuikZLO <?php echo QZ_VER ?></title>
 
@@ -140,10 +140,8 @@ elseif ($_GET['qz-page'] === "add"): ?>
   if (isset($_POST['pr-submit']))
   {
     $line = "\n";
-    $line.= "!i " . trim($_POST['pr-izvor']) . "\n" . "!m " . trim($_POST['pr-prevod']) . "\n" . "!p " . trim($_POST['pr-izvor-pl']) . "\n" . "!2 " . trim($_POST['pr-prevod-2']) . "\n" . "!3 " . trim($_POST['pr-prevod-3']) . "\n";
+    $line .= "!i " . trim($_POST['pr-izvor']) . "\n" . "!m " . trim($_POST['pr-prevod']) . "\n" . "!p " . trim($_POST['pr-izvor-pl']) . "\n" . "!2 " . trim($_POST['pr-prevod-2']) . "\n" . "!3 " . trim($_POST['pr-prevod-3']) . "\n";
     file_put_contents($_SESSION['qz-file'], $line, FILE_APPEND);
-    $cf[3] = "REV " . date('c') . "\n";
-    file_put_contents($_SESSION['qz-file'], $cf);
   }
 
   if (isset($_SESSION['qz-file']) && file_exists($_SESSION['qz-file']))

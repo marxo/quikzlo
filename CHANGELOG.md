@@ -1,6 +1,12 @@
 Changelog
 ==========
 
+0.0.4
+--------
+
+ - [FIX] Adding new translation set didn't work due to timestamp generation
+ - [FIX] Disabled user scaling of viewport
+
 0.0.3
 --------
 
