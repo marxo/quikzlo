@@ -10,4 +10,6 @@ Version: **0.0.4**
 *To-do*:
 
  - Add plural editing support
+ - Add support for deleting blocks
+ - Regenerate GEN tag on download
  - Increment version
