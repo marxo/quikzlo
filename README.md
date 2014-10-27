@@ -11,5 +11,5 @@ Version: **0.0.4**
 
  - Add plural editing support
  - Add support for deleting blocks
- - Regenerate GEN tag on download
+ - ~~Regenerate GEN tag on download~~
  - Increment version
