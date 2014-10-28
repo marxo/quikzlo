@@ -1,6 +1,16 @@
 Changelog
 ==========
 
+0.0.5
+-------
+
+ - [NEW] Plural editing support up to level 3
+ - [NEW] Fuzzy flag editable
+ - [FIX] GEN regenerates on save
+ - [FIX] When adding a multiline translation, newline now gets properly converted to `\n` character
+ - [FIX] Accessibility improvements
+ - [FIX] Slight navigation change
+
 0.0.4
 --------
 

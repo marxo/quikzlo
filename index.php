@@ -1,6 +1,6 @@
 <?php
 ob_start();
-define('QZ_VER', "0.0.4");
+define('QZ_VER', "0.0.5");
 session_start();
 
 if (isset($_GET['zl']))
@@ -21,7 +21,7 @@ $target_dir = "tmp/";
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
     <title>QuikZLO <?php echo QZ_VER ?></title>
 
@@ -41,7 +41,7 @@ $target_dir = "tmp/";
 
 <?php
 $_GET['qz-page'] = isset($_GET['qz-page']) ? $_GET['qz-page'] : NULL; ?>
-<h1>QuikZLO <?php echo QZ_VER ?></h1>
+<h1><a href="?qz-page=home">QuikZLO <?php echo QZ_VER ?></a></h1>
 <?php
 
 if (isset($_SESSION['qz-id'])): ?>
@@ -49,7 +49,6 @@ if (isset($_SESSION['qz-id'])): ?>
 
 <?php
 endif; ?>
-<a href="?qz-page=home">Home</a>
 <a href="?qz-page=create">Create a new translation</a>
 <a href="?qz-page=add">Add translation text</a>
 <a href="?qz-page=edit">Edit translation</a>
@@ -79,7 +78,7 @@ if ($_GET['qz-page'] === "create"): ?>
     <input type="text" name="np-ver" id="np-ver">
     <label for="np-enc">Charset</label>
     <select name="np-enc" id="np-enc">
-        <option value="UTF-8" selected readonly>UTF-8</option>
+        <option value="UTF-8" selected>UTF-8</option>
         <option value="iso-8859-1">iso-8859-1</option>
     </select>
     <label for="np-dir">Direction of text</label>
@@ -124,9 +123,9 @@ elseif ($_GET['qz-page'] === "add"): ?>
 
 <form method="POST">
     <label for="pr-izvor">Source text</label>
-    <input dir="<?php echo @trim(substr($cf[8], 4)) ?>" type="text" name="pr-izvor" id="pr-izvor">
+    <input dir="<?php echo @trim(substr($cf[8], 4)) ?>" type="text" name="pr-izvor" id="pr-izvor" required>
     <label for="pr-prevod">Translation text</label>
-    <input dir="<?php echo @trim(substr($cf[8], 4)) ?>" type="text" name="pr-prevod" id="pr-prevod">
+    <input dir="<?php echo @trim(substr($cf[8], 4)) ?>" type="text" name="pr-prevod" id="pr-prevod" required>
     <label for="pr-izvor-pl">Source plural</label>
     <input dir="<?php echo @trim(substr($cf[8], 4)) ?>" type="text" name="pr-izvor-pl" id="pr-izvor-pl">
     <label for="pr-prevod-2">Translation plural 2</label>
@@ -166,8 +165,12 @@ elseif ($_GET['qz-page'] === "edit"): ?>
       if (strlen($cf[$i]) > 4 && $cf[$i][1] === "i")
       { ?>
 
-    <label for="<?php echo $i; ?>"><h3><?php echo @substr($cf[$i], 3); ?></h3></label>
-    <textarea dir="<?php echo @trim(substr($cf[8], 4)) ?>" name="<?php echo $i; ?>" id="<?php echo $i; ?>" cols="30" rows="3"><?php echo @substr($cf[$i + 1], 3); ?></textarea>
+    <label for="fuzzy-<?= $i; ?>">Is fuzzy?</label>
+    <input type="checkbox" name="fuzzy-<?= $i; ?>" id="fuzzy-<?= $i; ?>" <?php if (@$cf[$i - 2][3] === "f") { echo "checked";} ?>>
+    <label for="<?= $i; ?>"><h3><?php echo @substr($cf[$i], 3); ?></h3></label>
+    <textarea dir="<?php echo @trim(substr($cf[8], 4)) ?>" name="<?= $i; ?>" id="<?= $i; ?>" cols="30" rows="3" required><?= @substr($cf[$i + 1], 3); ?></textarea>
+    <textarea name="pl-<?= $i; ?>" id="pl-<?= $i; ?>" cols="30" rows="3"><?php if (isset($cf[$i + 3]) && $cf[$i + 3][1] === "2") { echo @substr($cf[$i + 3], 3); } ?></textarea>
+    <textarea name="pl3-<?= $i; ?>" id="pl3-<?= $i; ?>" cols="30" rows="3"><?php if (isset($cf[$i + 4]) && $cf[$i + 4][1] === "3") { echo str_replace('\n', "\n", @substr($cf[$i + 4], 3)); } ?></textarea>
 
 
 <?php
@@ -181,7 +184,34 @@ elseif ($_GET['qz-page'] === "edit"): ?>
       {
         if (!empty($_POST[$i]))
         {
+          if (isset($_POST['fuzzy-'.$i])) {
+              if (isset($cf[$i - 2]) && $cf[$i - 2][1] === ",") {
+                  $cf[$i - 2] = "#, f\n";
+              } else {
+                  $cf[$i - 1] .= "#, f\n";
+                  echo $cf[$i - 1];
+              }
+          } else {
+            if (isset($cf[$i - 2]) && $cf[$i - 2][1] === ",") {
+                $cf[$i - 2] = "#,\n";
+            } else {
+                $cf[$i - 1] .= "#,\n";
+                echo $cf[$i - 1];
+            }
+          }
+
           $cf[$i + 1] = "!m " . trim($_POST[$i]) . "\n";
+
+          if ($cf[$i + 3][1] !== "2") {
+              $cf[$i + 2] .= "!2 " . str_replace(array("\r\n", "\r", "\n"), '\n', trim($_POST["pl-".$i])) . "\n";
+          } else {
+              $cf[$i + 3] = "!2 " . str_replace(array("\r\n", "\r", "\n"), '\n', trim($_POST["pl-".$i])) . "\n";
+          }
+          if ($cf[$i + 4][1] !== "3") {
+              $cf[$i + 3] .= "!3 " . str_replace(array("\r\n", "\r", "\n"), '\n', trim($_POST["pl3-".$i])) . "\n";
+          } else {
+              $cf[$i + 4] = "!3 " . str_replace(array("\r\n", "\r", "\n"), '\n', trim($_POST["pl3-".$i])) . "\n";
+          }
         }
       }
 
@@ -202,8 +232,6 @@ elseif ($_GET['qz-page'] === "edit"): ?>
 
 <?php
 else: ?>
-
-    <h2>Statis</h2>
 
     <h3>Upload a new file</h3>
 
@@ -270,6 +298,7 @@ if ($_GET['qz-page'] === "dl"): ?>
   {
     $cf = file($_SESSION['qz-file']);
     $cf[3] = "REV " . date('c') . "\n";
+    $cf[15] = "GEN QuikZLO " . QZ_VER . "\n";
     $rf = implode('', $cf);
     file_put_contents($_SESSION['qz-file'], $rf);
     flush();
